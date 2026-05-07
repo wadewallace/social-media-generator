@@ -1,0 +1,23 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Proxy Ghost Admin API — forwards the JWT auth header from the browser
+[[redirects]]
+  from = "/ghost-api/*"
+  to = "https://staging.escapecollective.com/ghost/api/admin/:splat"
+  status = 200
+  force = true
+
+# Proxy Ghost images — needed for PNG export (avoids CORS)
+[[redirects]]
+  from = "/ghost-image/*"
+  to = "https://staging.escapecollective.com/:splat"
+  status = 200
+  force = true
+
+# SPA fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

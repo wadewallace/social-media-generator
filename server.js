@@ -82,6 +82,11 @@ app.get('/login', (req, res) => {
   res.sendFile(join(__dirname, 'login.html'));
 });
 
+// ── Admin page ────────────────────────────────────────────────────────────────
+app.get('/admin', requireAuth, requireAdmin, (req, res) => {
+  res.sendFile(join(__dirname, 'admin.html'));
+});
+
 app.post('/api/auth/request-otp', async (req, res) => {
   const email = (req.body.email || '').trim().toLowerCase();
   if (!email) return res.status(400).json({ error: 'Email required' });

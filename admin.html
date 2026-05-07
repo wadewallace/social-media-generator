@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EC Social Tool — Admin</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f7f8fa;
+      min-height: 100vh;
+      color: #1a1f2e;
+    }
+
+    header {
+      background: #1a1a1a;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      gap: 12px;
+    }
+    header img { height: 26px; display: block; }
+    header .divider { width: 1px; height: 20px; background: rgba(255,255,255,0.2); }
+    header h1 { font-size: 15px; font-weight: 600; color: #fff; }
+    header .spacer { flex: 1; }
+    header .user-info { font-size: 13px; color: rgba(255,255,255,0.5); }
+    header .logout-btn {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 4px 0 4px 12px;
+      border-left: 1px solid rgba(255,255,255,0.15);
+      margin-left: 12px;
+    }
+    header .logout-btn:hover { color: #fff; }
+    header a {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      padding: 6px 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 4px;
+    }
+    header a:hover { color: #fff; border-color: rgba(255,255,255,0.4); }
+
+    .page {
+      max-width: 640px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .page-sub {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 32px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #eaecf0;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .card-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid #eaecf0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-header-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .card-header-count {
+      font-size: 12px;
+      color: #6b7280;
+      background: #f7f8fa;
+      border: 1px solid #eaecf0;
+      border-radius: 20px;
+      padding: 2px 10px;
+    }
+
+    /* Add user form */
+    .add-form {
+      padding: 20px 24px;
+      display: flex;
+      gap: 10px;
+      border-bottom: 1px solid #eaecf0;
+    }
+    .add-form input {
+      flex: 1;
+      padding: 9px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      border: 1px solid #eaecf0;
+      border-radius: 5px;
+      outline: none;
+      color: #1a1f2e;
+    }
+    .add-form input:focus { border-color: #FF6F42; box-shadow: 0 0 0 3px rgba(255,111,66,0.12); }
+    .add-form input::placeholder { color: #9ca3af; }
+    .add-form button {
+      padding: 9px 18px;
+      background: #FF6F42;
+      color: #fff;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .add-form button:hover { background: #e55a2b; }
+    .add-form button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* User list */
+    .user-list { list-style: none; }
+    .user-item {
+      display: flex;
+      align-items: center;
+      padding: 14px 24px;
+      border-bottom: 1px solid #f3f4f6;
+      gap: 12px;
+    }
+    .user-item:last-child { border-bottom: none; }
+
+    .user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #FF6F42;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+    .user-avatar.admin-avatar { background: #1a1a1a; }
+
+    .user-email { flex: 1; font-size: 14px; color: #1a1f2e; }
+
+    .admin-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #FF6F42;
+      background: #FFF0EB;
+      border: 1px solid #ffd4c2;
+      border-radius: 20px;
+      padding: 2px 8px;
+    }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #9ca3af;
+      font-size: 18px;
+      line-height: 1;
+      padding: 4px;
+      border-radius: 4px;
+      transition: color 0.12s, background 0.12s;
+    }
+    .remove-btn:hover { color: #dc2626; background: #fff5f5; }
+
+    .empty-state {
+      padding: 32px 24px;
+      text-align: center;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1a1a1a;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: transform 0.2s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.error { background: #dc2626; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="/assets/logo-master-orange.svg" alt="Escape Collective" />
+    <div class="divider"></div>
+    <h1>Social Tool — Admin</h1>
+    <div class="spacer"></div>
+    <a href="/">← Back to tool</a>
+    <span class="user-info" id="user-info"></span>
+    <button class="logout-btn" id="logout-btn">Sign out</button>
+  </header>
+
+  <div class="page">
+    <div class="page-title">Team Access</div>
+    <div class="page-sub">Manage who can sign in to EC Social Tool. Admins are set via environment variables.</div>
+
+    <!-- Admins -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-title">Admins</div>
+        <span class="card-header-count" id="admin-count">0</span>
+      </div>
+      <ul class="user-list" id="admin-list">
+        <li class="empty-state">Loading…</li>
+      </ul>
+    </div>
+
+    <!-- Team members -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-title">Team members</div>
+        <span class="card-header-count" id="user-count">0</span>
+      </div>
+      <div class="add-form">
+        <input type="email" id="new-email" placeholder="teammate@escapecollective.com" />
+        <button id="add-btn">Add user</button>
+      </div>
+      <ul class="user-list" id="user-list">
+        <li class="empty-state">Loading…</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let me = null;
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.toggle('error', isError);
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    function avatarLetter(email) {
+      return email.charAt(0).toUpperCase();
+    }
+
+    function renderAdmins(admins) {
+      const list = document.getElementById('admin-list');
+      document.getElementById('admin-count').textContent = admins.length;
+      if (!admins.length) {
+        list.innerHTML = '<li class="empty-state">No admins configured</li>';
+        return;
+      }
+      list.innerHTML = admins.map(email => `
+        <li class="user-item">
+          <div class="user-avatar admin-avatar">${avatarLetter(email)}</div>
+          <span class="user-email">${email}</span>
+          <span class="admin-badge">Admin</span>
+        </li>
+      `).join('');
+    }
+
+    function renderUsers(users) {
+      const list = document.getElementById('user-list');
+      document.getElementById('user-count').textContent = users.length;
+      if (!users.length) {
+        list.innerHTML = '<li class="empty-state">No team members added yet</li>';
+        return;
+      }
+      list.innerHTML = users.map(email => `
+        <li class="user-item" data-email="${email}">
+          <div class="user-avatar">${avatarLetter(email)}</div>
+          <span class="user-email">${email}</span>
+          <button class="remove-btn" data-email="${email}" title="Remove">×</button>
+        </li>
+      `).join('');
+
+      list.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', () => removeUser(btn.dataset.email));
+      });
+    }
+
+    async function loadData() {
+      const [meRes, usersRes] = await Promise.all([
+        fetch('/api/me'),
+        fetch('/api/admin/users'),
+      ]);
+      me = await meRes.json();
+      const users = await usersRes.json();
+
+      document.getElementById('user-info').textContent = me.email;
+      renderUsers(users);
+
+      // Fetch admin list by checking /api/me for admins — we derive from env
+      // We can infer admins aren't in the users list; show current user as admin
+      renderAdmins([me.email]);
+    }
+
+    async function addUser() {
+      const input = document.getElementById('new-email');
+      const email = input.value.trim().toLowerCase();
+      if (!email) return;
+
+      const btn = document.getElementById('add-btn');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/admin/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        if (res.ok) {
+          input.value = '';
+          showToast(`${email} added`);
+          await loadData();
+        } else {
+          const err = await res.json();
+          showToast(err.error || 'Failed to add user', true);
+        }
+      } catch {
+        showToast('Network error', true);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function removeUser(email) {
+      try {
+        const res = await fetch(`/api/admin/users/${encodeURIComponent(email)}`, {
+          method: 'DELETE',
+        });
+        if (res.ok) {
+          showToast(`${email} removed`);
+          await loadData();
+        } else {
+          showToast('Failed to remove user', true);
+        }
+      } catch {
+        showToast('Network error', true);
+      }
+    }
+
+    document.getElementById('add-btn').addEventListener('click', addUser);
+    document.getElementById('new-email').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') addUser();
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/login';
+    });
+
+    loadData().catch(() => {
+      window.location.href = '/login';
+    });
+  </script>
+</body>
+</html>

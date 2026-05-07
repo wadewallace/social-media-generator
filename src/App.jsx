@@ -196,6 +196,13 @@ export default function App() {
           >
             Publish to Instagram
           </button>
+          <a
+            href="/admin"
+            style={{ ...styles.btn, ...styles.btnGhost, textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+            title="Manage team access"
+          >
+            Team
+          </a>
         </div>
       </header>
 

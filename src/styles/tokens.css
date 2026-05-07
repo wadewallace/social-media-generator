@@ -1,0 +1,88 @@
+@font-face {
+  font-family: "ABC Social";
+  src: url("/fonts/ABCSocial-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "ABC Social";
+  src: url("/fonts/ABCSocial-RegularItalic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "ABC Social";
+  src: url("/fonts/ABCSocial-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "ABC Social";
+  src: url("/fonts/ABCSocial-MediumItalic.otf") format("opentype");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "ABC Social";
+  src: url("/fonts/ABCSocial-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "ABC Social";
+  src: url("/fonts/ABCSocial-BoldItalic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Max Fett";
+  src: url("/fonts/MaxFett-Black.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --esc-orange: rgb(255, 111, 66);
+  --esc-orange-deep: rgb(255, 104, 19);
+  --esc-yellow: rgb(255, 199, 0);
+  --esc-ink: rgb(24, 24, 24);
+  --esc-ink-deep: rgb(8, 9, 16);
+  --esc-ink-25: rgb(37, 37, 37);
+  --esc-paper: rgb(249, 249, 249);
+  --esc-paper-warm: rgb(224, 226, 222);
+  --esc-white: rgb(255, 255, 255);
+  --esc-gray-8e: rgb(142, 142, 147);
+
+  --font-display: "Max Fett", "Archivo Black", "Impact", sans-serif;
+  --font-sans: "ABC Social", "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "DM Mono", "IBM Plex Mono", ui-monospace, monospace;
+
+  /* App chrome */
+  --app-bg: #0f0f13;
+  --panel-bg: #1a1a20;
+  --panel-border: rgba(255,255,255,0.08);
+  --panel-text: rgba(249,249,249,0.9);
+  --panel-muted: rgba(249,249,249,0.45);
+  --input-bg: rgba(255,255,255,0.06);
+  --input-border: rgba(255,255,255,0.12);
+  --input-focus: var(--esc-orange);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--app-bg);
+  color: var(--panel-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}

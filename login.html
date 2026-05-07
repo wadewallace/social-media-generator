@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EC Social Tool — Login</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f7f8fa;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #1a1a1a;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    header img { height: 26px; display: block; }
+    header .divider { width: 1px; height: 20px; background: rgba(255,255,255,0.2); }
+    header h1 { font-size: 15px; font-weight: 600; color: #fff; letter-spacing: 0.01em; }
+
+    .container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #eaecf0;
+      border-radius: 8px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a1f2e;
+      margin-bottom: 6px;
+    }
+    .card-sub {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1a1f2e;
+      margin-bottom: 6px;
+    }
+
+    input {
+      display: block;
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 15px;
+      font-family: inherit;
+      border: 1px solid #eaecf0;
+      border-radius: 5px;
+      outline: none;
+      color: #1a1f2e;
+      background: #fff;
+      transition: border-color 0.15s;
+    }
+    input:focus { border-color: #FF6F42; box-shadow: 0 0 0 3px rgba(255,111,66,0.12); }
+    input[type="text"] { letter-spacing: 0.2em; font-weight: 600; font-size: 18px; text-align: center; }
+
+    button[type="submit"] {
+      display: block;
+      width: 100%;
+      margin-top: 16px;
+      padding: 11px;
+      background: #FF6F42;
+      color: #fff;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.15s;
+      letter-spacing: 0.03em;
+    }
+    button[type="submit"]:hover { background: #e55a2b; }
+    button[type="submit"]:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      color: #6b7280;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: inherit;
+      margin-bottom: 20px;
+      text-decoration: none;
+    }
+    .back-link:hover { color: #1a1f2e; }
+
+    .error {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: #fff5f5;
+      border: 1px solid #fecaca;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #dc2626;
+      display: none;
+    }
+    .error.visible { display: block; }
+
+    #step-otp { display: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="/assets/logo-master-orange.svg" alt="Escape Collective" />
+    <div class="divider"></div>
+    <h1>Social Tool</h1>
+  </header>
+
+  <div class="container">
+    <div class="card">
+
+      <!-- Step 1: Email -->
+      <div id="step-email">
+        <div class="card-title">Sign in</div>
+        <div class="card-sub">Enter your Escape Collective email to receive a login code.</div>
+        <form id="form-email">
+          <label for="email">Email address</label>
+          <input id="email" type="email" placeholder="you@escapecollective.com" autocomplete="email" required />
+          <div class="error" id="error-email"></div>
+          <button type="submit" id="btn-email">Send login code</button>
+        </form>
+      </div>
+
+      <!-- Step 2: OTP -->
+      <div id="step-otp">
+        <button class="back-link" id="btn-back">← Back</button>
+        <div class="card-title">Check your email</div>
+        <div class="card-sub" id="otp-sub">We sent a 6-digit code to <strong id="otp-email-label"></strong></div>
+        <form id="form-otp">
+          <label for="code">Login code</label>
+          <input id="code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="000000" autocomplete="one-time-code" required />
+          <div class="error" id="error-otp"></div>
+          <button type="submit" id="btn-otp">Sign in</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let pendingEmail = '';
+
+    const stepEmail = document.getElementById('step-email');
+    const stepOtp   = document.getElementById('step-otp');
+
+    // Step 1 — request OTP
+    document.getElementById('form-email').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const btn   = document.getElementById('btn-email');
+      const err   = document.getElementById('error-email');
+      err.classList.remove('visible');
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+
+      try {
+        const res = await fetch('/api/auth/request-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        const data = await res.json();
+        if (data.sent) {
+          pendingEmail = email;
+          document.getElementById('otp-email-label').textContent = email;
+          stepEmail.style.display = 'none';
+          stepOtp.style.display = 'block';
+          document.getElementById('code').focus();
+        } else {
+          err.textContent = 'Something went wrong. Please try again.';
+          err.classList.add('visible');
+        }
+      } catch {
+        err.textContent = 'Network error. Please try again.';
+        err.classList.add('visible');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Send login code';
+      }
+    });
+
+    // Step 2 — verify OTP
+    document.getElementById('form-otp').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const code = document.getElementById('code').value.trim();
+      const btn  = document.getElementById('btn-otp');
+      const err  = document.getElementById('error-otp');
+      err.classList.remove('visible');
+      btn.disabled = true;
+      btn.textContent = 'Signing in…';
+
+      try {
+        const res = await fetch('/api/auth/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: pendingEmail, code }),
+        });
+        if (res.ok) {
+          window.location.href = '/';
+        } else {
+          err.textContent = 'Incorrect or expired code. Please try again.';
+          err.classList.add('visible');
+          document.getElementById('code').value = '';
+          document.getElementById('code').focus();
+        }
+      } catch {
+        err.textContent = 'Network error. Please try again.';
+        err.classList.add('visible');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Sign in';
+      }
+    });
+
+    // Back button
+    document.getElementById('btn-back').addEventListener('click', () => {
+      stepOtp.style.display = 'none';
+      stepEmail.style.display = 'block';
+      document.getElementById('code').value = '';
+      document.getElementById('error-otp').classList.remove('visible');
+    });
+  </script>
+</body>
+</html>
